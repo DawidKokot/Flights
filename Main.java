@@ -1,58 +1,68 @@
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collections; //for sorting
 
 class Main {
   public static void main(String[] args) {
-
-    // creating the database using constructor
+    System.out.println(" ");
+    // "hello world" flight
+    Flight powrot = new Flight("Hello","World", 101010);
+    System.out.println(powrot.getDetails());
+    System.out.println("----------------------");
+    // creating the database using the constructor
     FlightDatabase K = new FlightDatabase();
-    // System.out.println(K.flights.get(0).getDetails());
-
-    // checking if there exists a flight between two cities
-    // K.checkIfFlightExists("Leeds", "Cracow");
-    // K.checkIfFlightExists("Leeds", "Tokyo");
-
-    // flights from a given city are assinged to ArrayList
-    ArrayList<Flight> fromCity = K.getFlightsFromCity("Leeds");
-
-    K.getFlightsFromCity("Kopenhagen");
+    //printing first flight in the K database:
+    System.out.println(K.flights.get(0).getDetails());
     System.out.println("----------------------");
 
-    // all flights to a given city stored in a ArrayList
-    //ArrayList<Flight> toCity = K.getFlightsToCity("Katowice");
-   // K.getFlightsToCity("Kopenhagen");
-   // System.out.println("----------------------");
+    // checking if there exists a flight between two cities
+    K.checkIfFlightExists("Leeds", "Cracow");
+    K.checkIfFlightExists("Leeds", "Tokyo");
+    System.out.println("----------------------");
+    // flights from a given city are assinged to ArrayList and then lists are printed
+    ArrayList<Flight> fromCity = K.getFlightsFromCity("Leeds");
+    System.out.println(fromCity);
 
-    // printing flights lists created above
-    //K.displayFlights(fromCity);
-    //K.displayFlights(toCity);
-    //System.out.println("----------------------");
+    ArrayList<Flight> fromCity2 =K.getFlightsFromCity("Kopenhagen");
+    System.out.println(fromCity2);
 
-    // combo approach
-    //K.displayFlightsFromCity("Katowice");
-   // K.displayFlightsToCity("Katowice");
-   // System.out.println("----------------------");
+    System.out.println("----------------------");
+
+    // all flights to a given city stored in a ArrayList and then lists are printed
+    ArrayList<Flight> toCity = K.getFlightsToCity("Katowice");
+    System.out.println(toCity);
+    ArrayList<Flight> toCity2 = K.getFlightsToCity("Kopenhagen");
+    System.out.println(toCity2);
+    System.out.println("----------------------");
+
+    // combo approach. printing all flight from and to Katowice
+    K.displayFlightsFromCity("Katowice");
+    K.displayFlightsToCity("Katowice");
+    System.out.println("----------------------");
+
     // list of all cities
-    //System.out.println(K.getCities());
-    // Flight powrot = new Flight("UK","Krakow");
-    // System.out.println(powrot.getDetails());
+    System.out.println(K.getCities());
 
+    //cheapest flight
     Flight cheapestFlight = K.getCheapestFlight();
-    System.out.println("cheapestFlight: " + cheapestFlight.getDetails());
+    System.out.println("cheapest flight: " + cheapestFlight.getDetails());
+    //cheapest flight from given city
+    System.out.println("cheapest flight from Leeds: " + K.getCheapestFlightFromCity("Leeds").getDetails());
+    System.out.println("----------------------");
 
-    System.out.println(K.getCheapestFlightFromCity("Leeds").getDetails());
-
+    //flights with 1 stop
     ArrayList<Journey> journeys = K.getFlights("Tokyo", "Manchester");
     System.out.println(journeys);
-  //  System.out.println(K.getFlights("Tokyo", "Manchester").second.getDetails());
+
   }
 }
+
 
 class Flight {
   String departure;
   String arrival;
   int price;
 
+  //constructor
   public Flight(String departure, String arrival, int price) {
     this.departure = departure;
     this.arrival = arrival;
@@ -65,6 +75,7 @@ class Flight {
 
 }
 
+//journey with one stop
 class Journey {
   Flight first;
   Flight second;
@@ -73,11 +84,16 @@ class Journey {
     this.first = first;
     this.second = second;
   }
-}
 
+  public String toString(){
+    return "Flight from " + this.first.departure + " to " + this.second.arrival + " with stop at " + this.first.arrival + " costs " + (this.first.price+this.second.price); 
+  }
+}
+//////////////////////////// DATABASE CLASS ///////////////////////////////////////
 class FlightDatabase {
   ArrayList<Flight> flights = new ArrayList<Flight>();
 
+  //constructor - master flight list
   public FlightDatabase() {
     this.flights.add(new Flight("Leeds", "New York", 1800));
     this.flights.add(new Flight("Leeds", "Cracow", 79));
@@ -103,20 +119,19 @@ class FlightDatabase {
     return cheapestFlight;
   }
 
-////////////////// indirect flight ///////////////////
-public ArrayList<Journey> getFlights(String start, String end){
-  ArrayList<Journey> result  = new ArrayList<Journey>(); 
-  ArrayList<Flight> fromCity = this.getFlightsFromCity(start);
-  ArrayList<Flight> toCity   = this.getFlightsToCity(end);
-  for (Flight fFrom : fromCity){
-    for (Flight fTo : toCity ){
-      if (fFrom.arrival.equals(fTo.departure)){
+  public ArrayList<Journey> getFlights(String start, String end){
+    ArrayList<Journey> result  = new ArrayList<Journey>(); 
+    ArrayList<Flight> fromCity = this.getFlightsFromCity(start);
+    ArrayList<Flight> toCity   = this.getFlightsToCity(end);
+    for (Flight fFrom : fromCity){
+      for (Flight fTo : toCity ){
+        if (fFrom.arrival.equals(fTo.departure)){
           result.add( new Journey(fFrom, fTo));
+        }
       }
     }
+    return result;
   }
-   return result;
-}
 
   public Flight getCheapestFlight() {
     Flight cheapestFlight = null;
